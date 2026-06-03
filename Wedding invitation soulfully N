@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Royal Wedding Invitation</title>
+    <!-- Google Fonts for Regal Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Montserrat:wght@300;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- canvas-confetti library for party poppers -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --royal-burgundy: #4A0E17;
+            --royal-gold: #D4AF37;
+            --light-gold: #F3E5AB;
+            --dark-velvet: #1A0508;
+            --text-light: #F9F6F0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: var(--dark-velvet);
+            color: var(--text-light);
+            text-align: center;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle, var(--royal-burgundy) 0%, var(--dark-velvet) 100%);
+        }
+
+        /* Music Floating Control */
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(74, 14, 23, 0.8);
+            border: 2px solid var(--royal-gold);
+            color: var(--royal-gold);
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .audio-control:hover {
+            background: var(--royal-gold);
+            color: var(--royal-burgundy);
+            box-shadow: 0 0 15px var(--royal-gold);
+        }
+
+        /* Container & Layout */
+        .invitation-card {
+            max-width: 650px;
+            margin: 60px auto;
+            padding: 40px 20px;
+            border: 3px double var(--royal-gold);
+            outline: 1px solid var(--royal-gold);
+            outline-offset: -15px;
+            background: rgba(26, 5, 8, 0.85);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        /* Monogram / Header */
+        .monogram {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 3rem;
+            color: var(--royal-gold);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            letter-spacing: 4px;
+            font-size: 0.9rem;
+            color: var(--light-gold);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .names {
+            font-size: 2.8rem;
+            font-style: italic;
+            color: var(--text-light);
+            margin: 25px 0;
+            line-height: 1.2;
+        }
+
+        .names span {
+            display: block;
+            font-family: 'Cinzel Decorative', serif;
+            font-style: normal;
+            font-size: 1.5rem;
+            color: var(--royal-gold);
+            margin: 10px 0;
+        }
+
+        /* Moving Photo Slideshow */
+        .slideshow-container {
+            width: 85%;
+            height: 350px;
+            margin: 30px auto;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--royal-gold);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out, transform 6s linear;
+            transform: scale(1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1.08); /* Subtle continuous movement effect */
+        }
+
+        /* Details & Timer */
+        .details {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            margin: 25px 0;
+            color: var(--light-gold);
+        }
+
+        .countdown-title {
+            margin-top: 40px;
+            font-size: 0.85rem;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .timer-box {
+            background: rgba(74, 14, 23, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            padding: 10px 15px;
+            min-width: 70px;
+            border-radius: 4px;
+        }
+
+        .timer-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--royal-gold);
+            display: block;
+        }
+
+        .timer-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            margin-top: 35px;
+        }
+
+        .btn {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            padding: 14px 30px;
+            border: none;
+            cursor: pointer;
+            width: 80%;
+            max-width: 300px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--royal-gold);
+            color: var(--dark-velvet);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--text-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--royal-gold);
+            border: 1px solid var(--royal-gold);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Tweaks */
+        @media (max-width: 600px) {
+            .invitation-card { margin: 20px 10px; padding: 30px 10px; }
+            .names { font-size: 2.2rem; }
+            .slideshow-container { height: 260px; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Music Configuration -->
+    <!-- Replace URL with a direct link to your hosting MP3 or audio stream -->
+    <audio id="bg-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    <button class="audio-control" id="music-btn" onclick="toggleMusic()">🎵 PLAY MUSIC</button>
+
+    <div class="invitation-card">
+        <div class="monogram">W</div>
+        
+        <h2>The Honor of Your Presence Is Requested</h2>
+        <p style="font-size: 1.1rem; letter-spacing: 2px;">AT THE ROYAL WEDDING CELEBRATION OF</p>
+
+        <div class="names">
+            Groom Name
+            <span>&</span>
+            Bride Name
+        </div>
+
+        <!-- Selected Photos Moving (Slideshow) -->
+        <!-- Replace src URLs with your actual photo links in GitHub -->
+        <div class="slideshow-container">
+            <img src="https://picsum.photos/id/201/600/400" class="slide active" alt="Couple Photo 1">
+            <img src="https://picsum.photos/id/249/600/400" class="slide" alt="Couple Photo 2">
+            <img src="https://picsum.photos/id/364/600/400" class="slide" alt="Couple Photo 3">
+        </div>
+
+        <div class="details">
+            <p style="font-weight: bold; color: var(--royal-gold); margin-bottom: 5px;">SATURDAY, OCTOBER 17, 2026</p>
+            <p>At Four O'Clock in the Afternoon</p>
+            <p style="margin-top: 15px; font-size: 0.9.rem; font-family: 'Montserrat';">THE GRAND PALACE BALLROOM, BENGALURU</p>
+        </div>
+
+        <h2 class="countdown-title">Counting Down to the Big Day</h2>
+        <!-- Countdown Timer Structure -->
+        <div class="timer" id="countdown-timer">
+            <div class="timer-box">
+                <span class="timer-number" id="days">00</span>
+                <span class="timer-label">Days</span>
+            </div>
+            <div class="timer-box">
+                <span class="timer-number" id="hours">00</span>
+                <span class="timer-label">Hrs</span>
+            </div>
+            <div class="timer-box">
+                <span class="timer-number" id="minutes">00</span>
+                <span class="timer-label">Min</span>
+            </div>
+            <div class="timer-box">
+                <span class="timer-number" id="seconds">00</span>
+                <span class="timer-label">Sec</span>
+            </div>
+        </div>
+
+        <!-- Functional Buttons -->
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="celebratePartyPopper()">🎉 Celebrate With Us!</button>
+            <!-- Replace link below with your actual Google Maps pin link -->
+            <button class="btn btn-secondary" onclick="window.open('https://maps.google.com', '_blank')">📍 View Location Map</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Moving Slideshow Configuration
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function showNextSlide() {
+            slides[currentSlideIndex].classList.remove('active');
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            slides[currentSlideIndex].classList.add('active');
+        }
+        setInterval(showNextSlide, 4500); // Transitions images every 4.5 seconds
+
+        // 2. Countdown Timer Setup
+        // Set your real wedding target date and time below
+        const weddingDate = new Date("Oct 17, 2026 16:00:00").getTime();
+
+        const timerInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = String(days).padStart(2, '0');
+            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("countdown-timer").innerHTML = "<p style='color:var(--royal-gold)'>The Celebration Has Begun!</p>";
+            }
+        }, 1000);
+
+        // 3. Audio/Background Music Toggle
+        // Note: Modern browsers require user interaction before playing audio automatically.
+        const music = document.getElementById("bg-music");
+        const musicBtn = document.getElementById("music-btn");
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play().catch(error => console.log("Audio play blocked by browser policies"));
+                musicBtn.innerText = "⏸ PAUSE MUSIC";
+            } else {
+                music.pause();
+                musicBtn.innerText = "🎵 PLAY MUSIC";
+            }
+        }
+
+        // 4. Party Poppers Configuration (using canvas-confetti)
+        function celebratePartyPopper() {
+            // Left burst
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { x: 0.1, y: 0.8 },
+                colors: ['#D4AF37', '#4A0E17', '#F3E5AB', '#FFFFFF']
+            });
+            // Right burst
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { x: 0.9, y: 0.8 },
+                colors: ['#D4AF37', '#4A0E17', '#F3E5AB', '#FFFFFF']
+            });
+        }
+        
+        // Auto-pop once shortly after page finishes loading to surprise guests
+        window.addEventListener('load', () => {
+            setTimeout(celebratePartyPopper, 1200);
+        });
+    </script>
+</body>
+</html>
